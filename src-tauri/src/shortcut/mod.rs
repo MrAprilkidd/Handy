@@ -165,9 +165,18 @@ pub fn change_binding(
     id: String,
     binding: String,
 ) -> Result<BindingResponse, String> {
-    // Reject empty bindings — every shortcut should have a value
+    // The spacebar toggle is optional. Every other shortcut needs a value.
     if binding.trim().is_empty() {
-        return Err("Binding cannot be empty".to_string());
+        if id != settings::SPACEBAR_TOGGLE_BINDING_ID {
+            return Err("Binding cannot be empty".to_string());
+        }
+        return clear_optional_binding(&app, id);
+    }
+    if id == settings::SPACEBAR_TOGGLE_BINDING_ID && is_bare_space(&binding) {
+        return Err(
+            "The spacebar dictation toggle needs a modifier so it does not collide with Space"
+                .to_string(),
+        );
     }
 
     let mut settings = settings::get_settings(&app);
@@ -260,6 +269,37 @@ pub fn change_binding(
     })
 }
 
+fn is_bare_space(raw: &str) -> bool {
+    let key = raw.trim().to_ascii_lowercase();
+    key == "space" || key == "spacebar"
+}
+
+/// Unbind the optional spacebar-dictation hotkey without registering a key.
+fn clear_optional_binding(app: &AppHandle, id: String) -> Result<BindingResponse, String> {
+    let mut settings = settings::get_settings(app);
+    let Some(existing) = settings.bindings.get(&id).cloned() else {
+        return Ok(BindingResponse {
+            success: false,
+            binding: None,
+            error: Some(format!("Binding with id '{id}' not found")),
+        });
+    };
+    if !existing.current_binding.trim().is_empty() {
+        if let Err(error) = unregister_shortcut(app, existing.clone()) {
+            debug!("clear_optional_binding: could not unregister '{id}': {error}");
+        }
+    }
+    let mut updated = existing;
+    updated.current_binding.clear();
+    settings.bindings.insert(id, updated.clone());
+    settings::write_settings(app, settings);
+    Ok(BindingResponse {
+        success: true,
+        binding: Some(updated),
+        error: None,
+    })
+}
+
 /// Best-effort re-register of the previous binding after a failed change,
 /// so a failure leaves the user's shortcut working exactly as before.
 fn restore_registration(app: &AppHandle, binding: &ShortcutBinding) {
@@ -283,6 +323,7 @@ pub fn reset_binding(app: AppHandle, id: String) -> Result<BindingResponse, Stri
 /// mid-capture. The "cancel" binding is untouched: it is managed dynamically
 /// by the recording lifecycle.
 pub fn suspend_all_shortcuts(app: &AppHandle) {
+    crate::spacebar::set_shortcut_capture(true);
     for (id, binding) in settings::get_bindings(app) {
         if id == "cancel" {
             continue;
@@ -312,6 +353,8 @@ pub fn resume_all_shortcuts(app: &AppHandle) {
             debug!("resume_all_shortcuts: could not register '{}': {}", id, e);
         }
     }
+    crate::spacebar::set_shortcut_capture(false);
+    crate::spacebar::prefer_hook_front();
 }
 
 /// Temporarily unregister all bindings while the user is recording a
@@ -507,6 +550,10 @@ fn register_all_shortcuts_for_implementation(
             .cloned()
             .unwrap_or_else(|| default_binding.clone());
 
+        if id == settings::SPACEBAR_TOGGLE_BINDING_ID && binding.current_binding.trim().is_empty() {
+            continue;
+        }
+
         // Validate the shortcut for the target implementation
         if let Err(e) =
             validate_shortcut_for_implementation(&binding.current_binding, implementation)
@@ -522,6 +569,10 @@ fn register_all_shortcuts_for_implementation(
                 .bindings
                 .insert(id.clone(), binding.clone());
             reset_bindings.push(id.clone());
+        }
+
+        if id == settings::SPACEBAR_TOGGLE_BINDING_ID && binding.current_binding.trim().is_empty() {
+            continue;
         }
 
         // Register with the appropriate implementation

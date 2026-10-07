@@ -485,7 +485,20 @@ pub fn create_recording_overlay(app_handle: &AppHandle) {
     }
 }
 
+static SPACEBAR_SUPPRESS_OVERLAY: AtomicBool = AtomicBool::new(false);
+
+/// While spacebar dictation is showing its own caret dot, the recording
+/// overlay stays hidden. Cleared on release so the transcribing overlay can
+/// appear, and when the caret position could not be found.
+#[cfg_attr(not(target_os = "windows"), allow(dead_code))]
+pub fn set_spacebar_overlay_suppressed(suppressed: bool) {
+    SPACEBAR_SUPPRESS_OVERLAY.store(suppressed, Ordering::SeqCst);
+}
+
 fn show_overlay_state(app_handle: &AppHandle, state: &str) {
+    if SPACEBAR_SUPPRESS_OVERLAY.load(Ordering::SeqCst) {
+        return;
+    }
     // Whether the overlay shows at all is governed by overlay_style; position
     // only chooses Top vs Bottom placement. Checked here (off the main thread)
     // so the common overlay-disabled case never pays for a main-thread hop.

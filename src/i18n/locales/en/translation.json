@@ -7,7 +7,11 @@
     "model": "Model",
     "quit": "Quit",
     "cancel": "Cancel",
-    "secureInputWarning": "⚠ Shortcuts blocked by Secure Input"
+    "secureInputWarning": "⚠ Shortcuts blocked by Secure Input",
+    "spacebarDictation": "Spacebar dictation"
+  },
+  "app": {
+    "edition": "Space"
   },
   "sidebar": {
     "general": "General",
@@ -155,6 +159,35 @@
     }
   },
   "settings": {
+    "spacebar": {
+      "title": "Spacebar dictation",
+      "description": "Tap Space to type a space. Hold it to dictate into the focused text box. Elevated windows and apps that do not expose UI Automation are left alone.",
+      "enabled": {
+        "label": "Hold Space to dictate",
+        "description": "A short tap still types a space. Holding past the threshold starts dictation, and releasing pastes the transcript."
+      },
+      "threshold": {
+        "label": "Hold threshold",
+        "description": "How long Space must be held before dictation starts."
+      },
+      "textFieldOnly": {
+        "label": "Only in text fields",
+        "description": "Arm the trigger only when the focused element is an editable text field."
+      },
+      "blockFullscreen": {
+        "label": "Skip fullscreen apps",
+        "description": "Do not arm the trigger while the foreground window covers the whole screen, such as most games."
+      },
+      "caretIndicator": {
+        "label": "Caret indicator",
+        "description": "Show a small pulsing dot at the caret while dictating. Falls back to the recording overlay when the caret cannot be found."
+      },
+      "excluded": {
+        "label": "Excluded apps",
+        "description": "One executable name per line. Space behaves normally in these apps.",
+        "placeholder": "game.exe"
+      }
+    },
     "modelSettings": {
       "title": "{{model}} Settings"
     },
@@ -179,6 +212,10 @@
           "transcribe_with_post_process": {
             "name": "Post-Processing Hotkey",
             "description": "Optional: A dedicated hotkey that always applies AI post-processing to your transcription."
+          },
+          "toggle_spacebar_dictation": {
+            "name": "Toggle Spacebar Dictation",
+            "description": "Optional hotkey that turns spacebar dictation on or off. Use a modifier so it does not collide with Space."
           }
         },
         "errors": {

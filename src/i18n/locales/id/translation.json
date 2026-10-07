@@ -7,7 +7,8 @@
     "model": "Model",
     "quit": "Keluar",
     "cancel": "Batal",
-    "secureInputWarning": "⚠ Pintasan diblokir oleh Secure Input"
+    "secureInputWarning": "⚠ Pintasan diblokir oleh Secure Input",
+    "spacebarDictation": "Spacebar dictation"
   },
   "sidebar": {
     "general": "Umum",
@@ -179,6 +180,10 @@
           "transcribe_with_post_process": {
             "name": "Pintasan Pascaproses",
             "description": "Opsional: pintasan khusus yang selalu menerapkan pascaproses AI pada transkripsi Anda."
+          },
+          "toggle_spacebar_dictation": {
+            "name": "Toggle Spacebar Dictation",
+            "description": "Optional hotkey that turns spacebar dictation on or off. Use a modifier so it does not collide with Space."
           }
         },
         "errors": {
@@ -645,6 +650,35 @@
           "details": "Fitur ucapan-ke-teks lokal Handy dibangun menggunakan transcribe.cpp dan ggml. Terima kasih kepada Georgi Gerganov dan para kontributor atas karya luar biasa mereka."
         }
       }
+    },
+    "spacebar": {
+      "title": "Spacebar dictation",
+      "description": "Tap Space to type a space. Hold it to dictate into the focused text box. Elevated windows and apps that do not expose UI Automation are left alone.",
+      "enabled": {
+        "label": "Hold Space to dictate",
+        "description": "A short tap still types a space. Holding past the threshold starts dictation, and releasing pastes the transcript."
+      },
+      "threshold": {
+        "label": "Hold threshold",
+        "description": "How long Space must be held before dictation starts."
+      },
+      "textFieldOnly": {
+        "label": "Only in text fields",
+        "description": "Arm the trigger only when the focused element is an editable text field."
+      },
+      "blockFullscreen": {
+        "label": "Skip fullscreen apps",
+        "description": "Do not arm the trigger while the foreground window covers the whole screen, such as most games."
+      },
+      "caretIndicator": {
+        "label": "Caret indicator",
+        "description": "Show a small pulsing dot at the caret while dictating. Falls back to the recording overlay when the caret cannot be found."
+      },
+      "excluded": {
+        "label": "Excluded apps",
+        "description": "One executable name per line. Space behaves normally in these apps.",
+        "placeholder": "game.exe"
+      }
     }
   },
   "footer": {
@@ -724,5 +758,8 @@
     "learnMore": "Cara memperbaiki",
     "recorderBlocked": "Pintasan tidak dapat direkam saat ini — macOS Secure Input memblokir peristiwa tombol. Selesaikan peringatan Secure Input terlebih dahulu.",
     "dismiss": "Tutup"
+  },
+  "app": {
+    "edition": "Space"
   }
 }

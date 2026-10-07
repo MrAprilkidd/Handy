@@ -7,7 +7,8 @@
     "model": "模型",
     "quit": "結束",
     "cancel": "取消",
-    "secureInputWarning": "⚠ 快捷鍵被 Secure Input 阻擋"
+    "secureInputWarning": "⚠ 快捷鍵被 Secure Input 阻擋",
+    "spacebarDictation": "Spacebar dictation"
   },
   "sidebar": {
     "general": "一般",
@@ -179,6 +180,10 @@
           "transcribe_with_post_process": {
             "name": "後處理快捷鍵",
             "description": "可選：專用快捷鍵，使用時一律對轉錄結果套用 AI 後處理"
+          },
+          "toggle_spacebar_dictation": {
+            "name": "Toggle Spacebar Dictation",
+            "description": "Optional hotkey that turns spacebar dictation on or off. Use a modifier so it does not collide with Space."
           }
         },
         "errors": {
@@ -645,6 +650,35 @@
         "label": "顯示新功能",
         "description": "Handy 更新後顯示版本資訊"
       }
+    },
+    "spacebar": {
+      "title": "Spacebar dictation",
+      "description": "Tap Space to type a space. Hold it to dictate into the focused text box. Elevated windows and apps that do not expose UI Automation are left alone.",
+      "enabled": {
+        "label": "Hold Space to dictate",
+        "description": "A short tap still types a space. Holding past the threshold starts dictation, and releasing pastes the transcript."
+      },
+      "threshold": {
+        "label": "Hold threshold",
+        "description": "How long Space must be held before dictation starts."
+      },
+      "textFieldOnly": {
+        "label": "Only in text fields",
+        "description": "Arm the trigger only when the focused element is an editable text field."
+      },
+      "blockFullscreen": {
+        "label": "Skip fullscreen apps",
+        "description": "Do not arm the trigger while the foreground window covers the whole screen, such as most games."
+      },
+      "caretIndicator": {
+        "label": "Caret indicator",
+        "description": "Show a small pulsing dot at the caret while dictating. Falls back to the recording overlay when the caret cannot be found."
+      },
+      "excluded": {
+        "label": "Excluded apps",
+        "description": "One executable name per line. Space behaves normally in these apps.",
+        "placeholder": "game.exe"
+      }
     }
   },
   "footer": {
@@ -724,5 +758,8 @@
     "learnMore": "如何解決",
     "recorderBlocked": "目前無法錄製快捷鍵——macOS 的 Secure Input 正在阻擋按鍵事件。請先解決 Secure Input 警告。",
     "dismiss": "關閉"
+  },
+  "app": {
+    "edition": "Space"
   }
 }

@@ -63,6 +63,7 @@ struct MenuInputs {
     downloaded_models: Vec<(String, String)>,
     locale: String,
     update_checks_enabled: bool,
+    spacebar_dictation_enabled: bool,
 }
 
 /// Complete description of what the tray should look like.
@@ -334,6 +335,7 @@ fn compute_desired(app: &AppHandle, icon_state: TrayIconState) -> TrayDesired {
             downloaded_models,
             locale: settings.app_language,
             update_checks_enabled: settings.update_checks_enabled,
+            spacebar_dictation_enabled: settings.spacebar_dictation_enabled,
         },
     }
 }
@@ -445,9 +447,9 @@ pub fn tray_tooltip() -> String {
 
 fn version_label() -> String {
     if cfg!(debug_assertions) {
-        format!("Handy v{} (Dev)", env!("CARGO_PKG_VERSION"))
+        format!("Handy Space v{} (Dev)", env!("CARGO_PKG_VERSION"))
     } else {
-        format!("Handy v{}", env!("CARGO_PKG_VERSION"))
+        format!("Handy Space v{}", env!("CARGO_PKG_VERSION"))
     }
 }
 
@@ -582,6 +584,35 @@ fn build_menu(app: &AppHandle, inputs: &MenuInputs) -> tauri::Result<(Menu<tauri
         menu.remove(&check_updates_i)?;
     }
 
+    // The label is read on every platform so the generated translation field
+    // is not dead. The menu item itself is Windows-only: the hook does not
+    // exist elsewhere, so the toggle would only persist a setting that never
+    // changes Space.
+    let spacebar_label = if strings.spacebar_dictation.is_empty() {
+        "Spacebar dictation".to_string()
+    } else {
+        strings.spacebar_dictation.clone()
+    };
+    #[cfg(target_os = "windows")]
+    {
+        let spacebar_i = CheckMenuItem::with_id(
+            app,
+            "spacebar_dictation",
+            &spacebar_label,
+            true,
+            inputs.spacebar_dictation_enabled,
+            None::<&str>,
+        )?;
+        let count = menu.items()?.len();
+        if count > 0 {
+            menu.insert(&spacebar_i, count - 1)?;
+        }
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        let _ = spacebar_label;
+    }
+
     // Both layouts start with [version, separator, ...]; slot the warning in
     // right below the version line so it's the first actionable thing seen.
     let mut tooltip = version_label;
@@ -694,6 +725,7 @@ mod tests {
             downloaded_models: vec![("small".to_string(), "Small".to_string())],
             locale: "en".to_string(),
             update_checks_enabled: true,
+            spacebar_dictation_enabled: true,
         }
     }
 

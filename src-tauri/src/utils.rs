@@ -86,6 +86,10 @@ fn native_windows_machine() -> Option<u16> {
 pub fn cancel_current_operation(app: &AppHandle) {
     info!("Initiating operation cancellation...");
 
+    // Bump the spacebar cancel generation before the coordinator hears about
+    // it, so a caret lookup still in flight does not start a new recording.
+    crate::spacebar::on_recording_cancelled();
+
     // Unregister the cancel shortcut asynchronously
     shortcut::unregister_cancel_shortcut(app);
 
