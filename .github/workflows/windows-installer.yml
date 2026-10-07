@@ -1,0 +1,29 @@
+name: Windows installer
+
+# Unsigned Windows x64 installer for this fork. Signing secrets are not
+# required: build.yml only runs trusted-signing-cli when sign-binaries is
+# true, and tauri.conf.json does not set a Windows signCommand.
+on:
+  push:
+    branches:
+      - main
+      - "cursor/**"
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: windows-installer-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows-x64:
+    permissions:
+      contents: write
+    uses: ./.github/workflows/build.yml
+    with:
+      platform: windows-latest
+      target: x86_64-pc-windows-msvc
+      sign-binaries: false
+      upload-artifacts: true
+      asset-prefix: handy-space
+    secrets: inherit

@@ -538,6 +538,13 @@ pub fn is_transcribe_binding(id: &str) -> bool {
     id == "transcribe" || id == "transcribe_with_post_process"
 }
 
+/// Spacebar dictation must not swallow a Space while a recording or a
+/// transcription is in flight: the coordinator would ignore that press and
+/// the character would be lost.
+fn publish_pipeline_activity(state: &CoordinatorState) {
+    crate::spacebar::set_pipeline_active(!matches!(state.stage, Stage::Idle));
+}
+
 impl TranscriptionCoordinator {
     pub fn new(app: AppHandle) -> Self {
         let (tx, rx) = mpsc::channel();
@@ -554,6 +561,7 @@ impl TranscriptionCoordinator {
                                 if let Some(effect) = state.on_grace_expired() {
                                     run_effect(&app, &mut state, effect);
                                 }
+                                publish_pipeline_activity(&state);
                                 continue;
                             }
                             Err(mpsc::RecvTimeoutError::Disconnected) => break,
@@ -580,6 +588,7 @@ impl TranscriptionCoordinator {
                             }
                         }
                     }
+                    publish_pipeline_activity(&state);
                 }
                 debug!("Transcription coordinator exited");
             }));

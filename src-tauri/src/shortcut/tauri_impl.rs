@@ -75,6 +75,11 @@ pub fn validate_shortcut(raw: &str) -> Result<(), String> {
 
 /// Register a shortcut using Tauri's global-shortcut plugin
 pub fn register_shortcut(app: &AppHandle, binding: ShortcutBinding) -> Result<(), String> {
+    if binding.id == crate::settings::SPACEBAR_TOGGLE_BINDING_ID
+        && binding.current_binding.trim().is_empty()
+    {
+        return Ok(());
+    }
     // Validate for Tauri requirements
     if let Err(e) = validate_shortcut(&binding.current_binding) {
         warn!(

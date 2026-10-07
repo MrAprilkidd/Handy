@@ -7,7 +7,8 @@
     "model": "मॉडल",
     "quit": "बाहर निकलें",
     "cancel": "रद्द करें",
-    "secureInputWarning": "⚠ Secure Input ने शॉर्टकट ब्लॉक किए हैं"
+    "secureInputWarning": "⚠ Secure Input ने शॉर्टकट ब्लॉक किए हैं",
+    "spacebarDictation": "Spacebar dictation"
   },
   "sidebar": {
     "general": "सामान्य",
@@ -179,6 +180,10 @@
           "transcribe_with_post_process": {
             "name": "पोस्ट-प्रोसेसिंग हॉटकी",
             "description": "वैकल्पिक: एक अलग हॉटकी जो आपके ट्रांसक्रिप्शन पर हमेशा AI पोस्ट-प्रोसेसिंग लागू करती है."
+          },
+          "toggle_spacebar_dictation": {
+            "name": "Toggle Spacebar Dictation",
+            "description": "Optional hotkey that turns spacebar dictation on or off. Use a modifier so it does not collide with Space."
           }
         },
         "errors": {
@@ -645,6 +650,35 @@
           "details": "Handy का लोकल स्पीच-टू-टेक्स्ट transcribe.cpp और ggml पर आधारित है. Georgi Gerganov और योगदान देने वालों के शानदार काम के लिए धन्यवाद."
         }
       }
+    },
+    "spacebar": {
+      "title": "Spacebar dictation",
+      "description": "Tap Space to type a space. Hold it to dictate into the focused text box. Elevated windows and apps that do not expose UI Automation are left alone.",
+      "enabled": {
+        "label": "Hold Space to dictate",
+        "description": "A short tap still types a space. Holding past the threshold starts dictation, and releasing pastes the transcript."
+      },
+      "threshold": {
+        "label": "Hold threshold",
+        "description": "How long Space must be held before dictation starts."
+      },
+      "textFieldOnly": {
+        "label": "Only in text fields",
+        "description": "Arm the trigger only when the focused element is an editable text field."
+      },
+      "blockFullscreen": {
+        "label": "Skip fullscreen apps",
+        "description": "Do not arm the trigger while the foreground window covers the whole screen, such as most games."
+      },
+      "caretIndicator": {
+        "label": "Caret indicator",
+        "description": "Show a small pulsing dot at the caret while dictating. Falls back to the recording overlay when the caret cannot be found."
+      },
+      "excluded": {
+        "label": "Excluded apps",
+        "description": "One executable name per line. Space behaves normally in these apps.",
+        "placeholder": "game.exe"
+      }
     }
   },
   "footer": {
@@ -724,5 +758,8 @@
     "learnMore": "इसे कैसे ठीक करें",
     "recorderBlocked": "अभी शॉर्टकट रिकॉर्ड नहीं किए जा सकते — macOS Secure Input कुंजी इवेंट ब्लॉक कर रहा है. पहले Secure Input चेतावनी हल करें.",
     "dismiss": "खारिज करें"
+  },
+  "app": {
+    "edition": "Space"
   }
 }

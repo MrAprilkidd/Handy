@@ -1,4 +1,3 @@
-use crate::utils;
 use log::{debug, warn};
 use serde::de::{self, Visitor};
 use serde::{Deserialize, Deserializer, Serialize};
@@ -530,7 +529,33 @@ pub struct AppSettings {
     /// `overlay_position` (position `none` → style `None`).
     #[serde(default = "default_overlay_style")]
     pub overlay_style: OverlayStyle,
+    /// Hold Space to dictate. A tap still inserts a space. Windows only; other
+    /// platforms store the preference and do not install a hook.
+    #[serde(default = "default_spacebar_dictation_enabled")]
+    pub spacebar_dictation_enabled: bool,
+    /// How long Space must be held before dictation starts.
+    #[serde(default = "default_spacebar_hold_threshold_ms")]
+    pub spacebar_hold_threshold_ms: u64,
+    /// Arm the trigger only when UI Automation says the focus is an editable
+    /// text field.
+    #[serde(default = "default_spacebar_text_field_only")]
+    pub spacebar_text_field_only: bool,
+    /// Leave Space alone while the foreground window covers the whole monitor.
+    #[serde(default = "default_spacebar_block_fullscreen")]
+    pub spacebar_block_fullscreen: bool,
+    /// Normalized executable names (`game`, not `Game.exe`) that never arm
+    /// the trigger.
+    #[serde(default)]
+    pub spacebar_excluded_apps: Vec<String>,
+    /// Draw a pulsing dot at the caret while dictating. When the caret cannot
+    /// be found, the normal recording overlay is used instead.
+    #[serde(default = "default_spacebar_caret_indicator")]
+    pub spacebar_caret_indicator: bool,
 }
+
+/// Optional hotkey that flips [`AppSettings::spacebar_dictation_enabled`].
+/// Empty means unbound.
+pub const SPACEBAR_TOGGLE_BINDING_ID: &str = "toggle_spacebar_dictation";
 
 fn default_model() -> String {
     "".to_string()
@@ -582,6 +607,26 @@ fn default_overlay_position() -> OverlayPosition {
     // Position only matters when the overlay is shown; whether it shows at all is
     // `overlay_style` (Linux defaults that to None). So a single default suffices.
     OverlayPosition::Bottom
+}
+
+fn default_spacebar_dictation_enabled() -> bool {
+    true
+}
+
+fn default_spacebar_hold_threshold_ms() -> u64 {
+    350
+}
+
+fn default_spacebar_text_field_only() -> bool {
+    true
+}
+
+fn default_spacebar_block_fullscreen() -> bool {
+    true
+}
+
+fn default_spacebar_caret_indicator() -> bool {
+    true
 }
 
 fn default_overlay_style() -> OverlayStyle {
@@ -928,6 +973,16 @@ pub fn get_default_settings() -> AppSettings {
             current_binding: "escape".to_string(),
         },
     );
+    bindings.insert(
+        SPACEBAR_TOGGLE_BINDING_ID.to_string(),
+        ShortcutBinding {
+            id: SPACEBAR_TOGGLE_BINDING_ID.to_string(),
+            name: "Toggle Spacebar Dictation".to_string(),
+            description: "Optional hotkey that turns spacebar dictation on or off.".to_string(),
+            default_binding: String::new(),
+            current_binding: String::new(),
+        },
+    );
 
     AppSettings {
         settings_schema_version: default_settings_schema_version(),
@@ -993,6 +1048,12 @@ pub fn get_default_settings() -> AppSettings {
         vad_enabled: default_vad_enabled(),
         vad_backend: VadBackend::default(),
         overlay_style: default_overlay_style(),
+        spacebar_dictation_enabled: default_spacebar_dictation_enabled(),
+        spacebar_hold_threshold_ms: default_spacebar_hold_threshold_ms(),
+        spacebar_text_field_only: default_spacebar_text_field_only(),
+        spacebar_block_fullscreen: default_spacebar_block_fullscreen(),
+        spacebar_excluded_apps: Vec::new(),
+        spacebar_caret_indicator: default_spacebar_caret_indicator(),
     }
 }
 
@@ -1228,13 +1289,12 @@ fn apply_settings_migrations(
     updated
 }
 
-/// Update checks are forced off (without touching the persisted setting) when
-/// `HANDY_DISABLE_UPDATER` is set — e.g. by the Nix package, since self-update
-/// can't work against an immutable /nix/store install.
+/// Update checks are always off in this fork. An official Handy release must
+/// not be able to replace a Handy Space install. The persisted
+/// `update_checks_enabled` value is left untouched, matching the
+/// `HANDY_DISABLE_UPDATER` override the Nix package already uses.
 pub fn update_checks_forced_disabled() -> bool {
-    use std::sync::OnceLock;
-    static IS_UPDATER_DISABLED: OnceLock<bool> = OnceLock::new();
-    *IS_UPDATER_DISABLED.get_or_init(|| utils::env_flag_enabled("HANDY_DISABLE_UPDATER"))
+    true
 }
 
 /// Effective updater state: the user's stored preference, overridden to `false`

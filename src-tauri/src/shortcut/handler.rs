@@ -50,6 +50,13 @@ pub fn handle_shortcut_event(
         return;
     }
 
+    if binding_id == crate::settings::SPACEBAR_TOGGLE_BINDING_ID {
+        if is_pressed {
+            crate::spacebar::toggle_enabled(app);
+        }
+        return;
+    }
+
     let Some(action) = ACTION_MAP.get(binding_id) else {
         warn!(
             "No action defined in ACTION_MAP for shortcut ID '{}'. Shortcut: '{}', Pressed: {}",

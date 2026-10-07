@@ -459,6 +459,11 @@ pub fn init_shortcuts(app: &AppHandle) -> Result<(), String> {
 
 /// Register a shortcut
 pub fn register_shortcut(app: &AppHandle, binding: ShortcutBinding) -> Result<(), String> {
+    if binding.id == crate::settings::SPACEBAR_TOGGLE_BINDING_ID
+        && binding.current_binding.trim().is_empty()
+    {
+        return Ok(());
+    }
     let state = app
         .try_state::<HandyKeysState>()
         .ok_or("HandyKeysState not initialized")?;

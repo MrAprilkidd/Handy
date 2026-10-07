@@ -451,6 +451,54 @@ async changeShowTrayIconSetting(enabled: boolean) : Promise<Result<null, string>
     else return { status: "error", error: e  as any };
 }
 },
+async changeSpacebarDictationEnabledSetting(enabled: boolean) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("change_spacebar_dictation_enabled_setting", { enabled }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async changeSpacebarHoldThresholdMsSetting(ms: number) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("change_spacebar_hold_threshold_ms_setting", { ms }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async changeSpacebarTextFieldOnlySetting(enabled: boolean) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("change_spacebar_text_field_only_setting", { enabled }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async changeSpacebarBlockFullscreenSetting(enabled: boolean) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("change_spacebar_block_fullscreen_setting", { enabled }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async changeSpacebarCaretIndicatorSetting(enabled: boolean) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("change_spacebar_caret_indicator_setting", { enabled }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async changeSpacebarExcludedAppsSetting(apps: string[]) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("change_spacebar_excluded_apps_setting", { apps }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async changeTranscribeAcceleratorSetting(accelerator: TranscribeAcceleratorSetting) : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("change_transcribe_accelerator_setting", { accelerator }) };
@@ -1017,7 +1065,35 @@ vad_backend?: VadBackend;
  * not gated on this — that follows model capability. Migrated from the old
  * `overlay_position` (position `none` → style `None`).
  */
-overlay_style?: OverlayStyle }
+overlay_style?: OverlayStyle; 
+/**
+ * Hold Space to dictate. A tap still inserts a space. Windows only; other
+ * platforms store the preference and do not install a hook.
+ */
+spacebar_dictation_enabled?: boolean; 
+/**
+ * How long Space must be held before dictation starts.
+ */
+spacebar_hold_threshold_ms?: number; 
+/**
+ * Arm the trigger only when UI Automation says the focus is an editable
+ * text field.
+ */
+spacebar_text_field_only?: boolean; 
+/**
+ * Leave Space alone while the foreground window covers the whole monitor.
+ */
+spacebar_block_fullscreen?: boolean; 
+/**
+ * Normalized executable names (`game`, not `Game.exe`) that never arm
+ * the trigger.
+ */
+spacebar_excluded_apps?: string[]; 
+/**
+ * Draw a pulsing dot at the caret while dictating. When the caret cannot
+ * be found, the normal recording overlay is used instead.
+ */
+spacebar_caret_indicator?: boolean }
 export type AudioDevice = { index: string; name: string; is_default: boolean }
 export type AutoSubmitKey = "enter" | "ctrl_enter" | "cmd_enter"
 export type AvailableAccelerators = { transcribe: string[]; ort: string[]; gpu_devices: GpuDeviceOption[] }

@@ -186,6 +186,10 @@ pub fn initialize_shortcuts(app: AppHandle) -> Result<(), String> {
 
     // Initialize shortcuts
     crate::shortcut::init_shortcuts(&app);
+    // handy-keys installs its own low-level hook during init. Reinstall the
+    // spacebar hook afterwards so a bare Space is classified before that hook
+    // sees it. Modifier+Space still falls through to the shortcut backend.
+    crate::spacebar::prefer_hook_front();
 
     // Mark as initialized before reconciling the macOS Secure Input fallback.
     app.manage(ShortcutsInitialized);

@@ -22,6 +22,7 @@ mod secure_input;
 mod settings;
 mod shortcut;
 mod signal_handle;
+mod spacebar;
 mod transcription_coordinator;
 mod tray;
 mod tray_i18n;
@@ -315,6 +316,9 @@ fn initialize_core_logic(app_handle: &AppHandle) {
                 // Use centralized cancellation that handles all operations
                 cancel_current_operation(app);
             }
+            "spacebar_dictation" => {
+                spacebar::toggle_enabled(app);
+            }
             "quit" => {
                 app.exit(0);
             }
@@ -364,6 +368,11 @@ fn initialize_core_logic(app_handle: &AppHandle) {
 
     // Create the recording overlay window (hidden by default)
     utils::create_recording_overlay(app_handle);
+
+    // Windows hold-Space dictation. Other platforms keep the settings and
+    // do not install a hook. Shortcuts are registered later by the frontend;
+    // that path reinstalls this hook so it stays in front of handy-keys.
+    spacebar::init(app_handle);
 }
 
 #[tauri::command]
@@ -706,6 +715,12 @@ pub fn run(cli_args: CliArgs) {
             shortcut::change_keyboard_implementation_setting,
             shortcut::get_keyboard_implementation,
             shortcut::change_show_tray_icon_setting,
+            spacebar::change_spacebar_dictation_enabled_setting,
+            spacebar::change_spacebar_hold_threshold_ms_setting,
+            spacebar::change_spacebar_text_field_only_setting,
+            spacebar::change_spacebar_block_fullscreen_setting,
+            spacebar::change_spacebar_caret_indicator_setting,
+            spacebar::change_spacebar_excluded_apps_setting,
             shortcut::change_transcribe_accelerator_setting,
             shortcut::change_ort_accelerator_setting,
             shortcut::change_transcribe_gpu_device,
@@ -945,7 +960,7 @@ pub fn run(cli_args: CliArgs) {
             // for portable mode (redirects WebView2 cache to portable Data dir)
             let mut win_builder =
                 tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("/".into()))
-                    .title("Handy")
+                    .title("Handy Space")
                     .inner_size(680.0, 570.0)
                     .min_inner_size(680.0, 570.0)
                     .resizable(true)

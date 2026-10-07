@@ -187,6 +187,42 @@ const settingUpdaters: {
     commands.changeChineseScriptSetting(value as ChineseScript),
   show_tray_icon: (value) =>
     commands.changeShowTrayIconSetting(value as boolean),
+  spacebar_dictation_enabled: async (value) => {
+    const result = await commands.changeSpacebarDictationEnabledSetting(
+      value as boolean,
+    );
+    if (result.status === "error") throw new Error(result.error);
+  },
+  spacebar_hold_threshold_ms: async (value) => {
+    const result = await commands.changeSpacebarHoldThresholdMsSetting(
+      value as number,
+    );
+    if (result.status === "error") throw new Error(result.error);
+  },
+  spacebar_text_field_only: async (value) => {
+    const result = await commands.changeSpacebarTextFieldOnlySetting(
+      value as boolean,
+    );
+    if (result.status === "error") throw new Error(result.error);
+  },
+  spacebar_block_fullscreen: async (value) => {
+    const result = await commands.changeSpacebarBlockFullscreenSetting(
+      value as boolean,
+    );
+    if (result.status === "error") throw new Error(result.error);
+  },
+  spacebar_caret_indicator: async (value) => {
+    const result = await commands.changeSpacebarCaretIndicatorSetting(
+      value as boolean,
+    );
+    if (result.status === "error") throw new Error(result.error);
+  },
+  spacebar_excluded_apps: async (value) => {
+    const result = await commands.changeSpacebarExcludedAppsSetting(
+      value as string[],
+    );
+    if (result.status === "error") throw new Error(result.error);
+  },
   transcribe_accelerator: (value) =>
     commands.changeTranscribeAcceleratorSetting(
       value as TranscribeAcceleratorSetting,
